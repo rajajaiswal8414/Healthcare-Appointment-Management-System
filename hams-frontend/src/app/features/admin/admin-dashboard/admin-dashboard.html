@@ -1,0 +1,299 @@
+<!-- admin-dashboard.component.html -->
+<div class="dashboard">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md p-6 flex flex-col">
+      <div class="mb-8 border-b pb-4">
+        <div class="text-2xl font-bold text-blue-600 flex items-center gap-2">⚕ MediCare</div>
+      </div>
+      <ul class="flex flex-col gap-2">
+        <li>
+          <a
+            href="#"
+            class="flex items-center gap-2 px-4 py-2 font-medium text-gray-700 bg-blue-50 border-l-4 border-blue-600 rounded-l"
+            >📊 Dashboard</a
+          >
+        </li>
+        <li>
+          <button
+            (click)="logout()"
+            class="flex items-center gap-2 px-4 py-2 font-medium text-red-600 hover:bg-gray-100 hover:border-l-4 hover:border-red-600 rounded-l w-full text-left"
+          >
+            🚪 Logout
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 bg-gray-100 overflow-y-auto">
+      <!-- Top Bar -->
+      <div class="flex justify-between items-center mb-8 bg-white p-4 rounded-lg shadow">
+        <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+        <div class="flex items-center gap-4">
+          <!-- Profile -->
+          <div class="relative dropdown-trigger">
+            <div
+              (click)="toggleProfile()"
+              class="flex items-center gap-3 bg-gray-100 p-2 rounded-lg cursor-pointer hover:bg-gray-200 transition"
+            >
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-semibold flex items-center justify-center"
+              >
+                {{ getAdminInitials() }}
+              </div>
+              <div class="text-left">
+                <div class="font-semibold text-gray-800 text-sm">
+                  {{ currentAdmin?.adminName || 'Admin User' }}
+                </div>
+                <div class="text-gray-500 text-xs">System Administrator</div>
+              </div>
+              <span class="text-gray-500 text-xs">▼</span>
+            </div>
+            @if (showProfile) {
+            <div
+              class="dropdown-content absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-lg z-50"
+            >
+              <button
+                (click)="logout()"
+                class="flex items-center gap-2 p-3 text-red-600 hover:bg-gray-100 w-full text-left"
+              >
+                🚪 Logout
+              </button>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      @if (isLoading) {
+      <div class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+      } @else {
+
+      <!-- Doctors List -->
+      <div class="bg-white p-6 rounded-xl shadow mb-6">
+        <div class="flex justify-between items-center mb-4 border-b pb-3">
+          <h2 class="text-lg font-semibold text-gray-800">Registered Doctors</h2>
+          <button
+            (click)="openDoctorRegister()"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+          >
+            <span>+</span> Add New Doctor
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-4 py-2 text-sm font-semibold text-gray-700">Name</th>
+                <th class="px-4 py-2 text-sm font-semibold text-gray-700">Specialization</th>
+                <th class="px-4 py-2 text-sm font-semibold text-gray-700">Experience</th>
+                <th class="px-4 py-2 text-sm font-semibold text-gray-700">Qualification</th>
+                <th class="px-4 py-2 text-sm font-semibold text-gray-700">Contact Number</th>
+                <th class="px-4 py-2 text-sm font-semibold text-gray-700">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              @for (doctor of recentDoctors; track doctor.doctorId) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 font-semibold">{{ doctor.doctorName }}</td>
+                <td class="px-4 py-2">{{ doctor.specialization }}</td>
+                <td class="px-4 py-2">{{ doctor.yearOfExperience }} years</td>
+                <td class="px-4 py-2">{{ doctor.qualification }}</td>
+                <td class="px-4 py-2">{{ doctor.contactNumber }}</td>
+                <td class="px-4 py-2">
+                  <div class="flex gap-2">
+                    <button
+                      (click)="openUpdateDoctor(doctor)"
+                      class="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition text-sm"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      (click)="deleteDoctor(doctor.doctorId)"
+                      class="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              } @if (recentDoctors.length === 0) {
+              <tr>
+                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                  No doctors found. Click "Add New Doctor" to register the first doctor.
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      }
+
+      <!-- Doctor Registration Modal -->
+      @if (showDoctorRegister) {
+      <div
+        class="fixed inset-0 flex items-center justify-center p-4 z-50"
+        (click)="closeDoctorRegister()"
+        style="background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px)"
+      >
+        <div
+          class="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative"
+          (click)="$event.stopPropagation()"
+        >
+          <app-doctor-register
+            [isOpen]="showDoctorRegister"
+            [specializations]="getSpecializations()"
+            (close)="closeDoctorRegister()"
+            (doctorCreated)="onDoctorCreated()"
+          ></app-doctor-register>
+        </div>
+      </div>
+      }
+
+      <!-- Update Doctor Modal -->
+      @if (showUpdateDoctor && selectedDoctor) {
+      <div
+        class="fixed inset-0 flex items-center justify-center p-4 z-50"
+        (click)="closeUpdateDoctor()"
+        style="background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px)"
+      >
+        <div
+          class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+          (click)="$event.stopPropagation()"
+        >
+          <div
+            class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center rounded-t-2xl"
+          >
+            <div>
+              <h2 class="text-2xl font-bold text-gray-800">Update Doctor Details</h2>
+              <p class="text-gray-600 mt-1">Update contact information and experience</p>
+            </div>
+            <button
+              (click)="closeUpdateDoctor()"
+              class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-200"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="p-6">
+            <!-- Doctor Info (Read-only) -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+              <h3 class="font-semibold text-gray-800 mb-2">Doctor Information (Read-only)</h3>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <label class="text-gray-600">Name:</label>
+                  <p class="font-medium">{{ selectedDoctor.doctorName }}</p>
+                </div>
+                <div>
+                  <label class="text-gray-600">Email:</label>
+                  <p class="font-medium">{{ selectedDoctor.email }}</p>
+                </div>
+                <div>
+                  <label class="text-gray-600">Qualification:</label>
+                  <p class="font-medium">{{ selectedDoctor.qualification }}</p>
+                </div>
+                <div>
+                  <label class="text-gray-600">Specialization:</label>
+                  <p class="font-medium">{{ selectedDoctor.specialization }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Update Form -->
+            <form [formGroup]="updateDoctorForm" (ngSubmit)="onUpdateDoctor()" class="space-y-4">
+              <!-- Contact Number -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Contact Number</label>
+                <input
+                  type="tel"
+                  formControlName="contactNumber"
+                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+                  placeholder="Enter contact number"
+                />
+                @if (updateDoctorForm.get('contactNumber')?.invalid &&
+                updateDoctorForm.get('contactNumber')?.touched) {
+                <p class="text-red-500 text-sm mt-1">Contact number must be exactly 10 digits.</p>
+                }
+              </div>
+
+              <!-- Years of Experience -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Years of Experience</label
+                >
+                <input
+                  type="number"
+                  formControlName="yearOfExperience"
+                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+                  placeholder="Enter years of experience"
+                  min="0"
+                  max="50"
+                />
+                @if (updateDoctorForm.get('yearOfExperience')?.invalid &&
+                updateDoctorForm.get('yearOfExperience')?.touched) {
+                <p class="text-red-500 text-sm mt-1">Years of experience is required (0-50).</p>
+                }
+              </div>
+
+              <!-- Clinic Address -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Clinic Address</label>
+                <textarea
+                  formControlName="clinicAddress"
+                  rows="3"
+                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 resize-none"
+                  placeholder="Enter clinic address"
+                ></textarea>
+                @if (updateDoctorForm.get('clinicAddress')?.invalid &&
+                updateDoctorForm.get('clinicAddress')?.touched) {
+                <p class="text-red-500 text-sm mt-1">
+                  Clinic address is required (min 10 characters).
+                </p>
+                }
+              </div>
+
+              <!-- Error Message -->
+              @if (updateError) {
+              <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p class="text-red-600 text-sm">{{ updateError }}</p>
+              </div>
+              }
+
+              <!-- Action Buttons -->
+              <div class="flex gap-4 pt-4">
+                <button
+                  type="button"
+                  (click)="closeUpdateDoctor()"
+                  class="flex-1 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  [disabled]="updateDoctorForm.invalid || isUpdating"
+                  class="flex-1 py-3 bg-green-600 text-white rounded-xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
+                >
+                  {{ isUpdating ? 'Updating...' : 'Update Doctor' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      }
+    </main>
+  </div>
+</div>

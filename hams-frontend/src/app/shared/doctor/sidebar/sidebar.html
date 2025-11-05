@@ -1,0 +1,56 @@
+<aside class="fixed overflow-y-auto w-64 bg-white shadow-lg p-6 shrink-0 h-[90%]">
+  <div class="pb-6 border-b border-gray-200">
+    <div class="text-2xl font-bold text-blue-600 flex items-center gap-2">⚕ MediCare</div>
+  </div>
+
+  <ul class="mt-4 space-y-1">
+    <li>
+      <a
+        [routerLink]="['/doctor/dashboard']"
+        class="flex items-center gap-2 px-4 py-2 font-medium text-gray-700 bg-blue-50 border-l-4 border-blue-600 rounded-r-md"
+        >📊 Dashboard</a
+      >
+    </li>
+
+    <li>
+      <a
+        [routerLink]="['/doctor/appointments']"
+        class="flex items-center gap-2 px-4 py-2 font-medium text-gray-700 hover:bg-gray-100 hover:border-l-4 hover:border-blue-600 rounded-r-md"
+        >📅 Appointments</a
+      >
+    </li>
+
+    <li>
+      <a
+        [routerLink]="['/doctor/patients']"
+        class="flex items-center gap-2 px-4 py-2 font-medium text-gray-700 hover:bg-gray-100 hover:border-l-4 hover:border-blue-600 rounded-r-md"
+        >👥 Patients</a
+      >
+    </li>
+
+    <li>
+      <a
+        [routerLink]="['/doctor/availability']"
+        class="flex items-center gap-2 px-4 py-2 font-medium text-gray-700 hover:bg-gray-100 hover:border-l-4 hover:border-blue-600 rounded-r-md"
+        >⏰ Availability</a
+      >
+    </li>
+
+    <li>
+      <a
+        [routerLink]="['/doctor/medical-record']"
+        class="flex items-center gap-2 px-4 py-2 font-medium text-gray-700 hover:bg-gray-100 hover:border-l-4 hover:border-blue-600 rounded-r-md"
+        >📋 Medical Records</a
+      >
+    </li>
+
+    <li>
+      <button
+        (click)="logout()"
+        class="flex items-center gap-2 px-4 py-2 font-medium text-red-600 hover:bg-gray-100 hover:border-l-4 hover:border-red-600 rounded-l w-full text-left"
+      >
+        🚪 Logout
+      </button>
+    </li>
+  </ul>
+</aside>

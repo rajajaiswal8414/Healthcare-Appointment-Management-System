@@ -1,0 +1,143 @@
+<!-- login.html - UPDATE WITH ROLE SELECTION -->
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        Sign in to your account
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600">Select your account type</p>
+    </div>
+
+    <!-- Role Selection -->
+    <div class="flex space-x-4 mb-6">
+      <button
+        type="button"
+        (click)="setLoginMode('patient')"
+        [class]="
+          loginMode === 'patient'
+            ? 'flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700'
+            : 'flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50'
+        "
+      >
+        Patient
+      </button>
+      <button
+        type="button"
+        (click)="setLoginMode('doctor')"
+        [class]="
+          loginMode === 'doctor'
+            ? 'flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700'
+            : 'flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50'
+        "
+      >
+        Doctor
+      </button>
+      <button
+        type="button"
+        (click)="setLoginMode('admin')"
+        [class]="
+          loginMode === 'admin'
+            ? 'flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700'
+            : 'flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50'
+        "
+      >
+        Admin
+      </button>
+    </div>
+
+    <form class="mt-8 space-y-6" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <div class="rounded-md shadow-sm -space-y-px">
+        <div>
+          <label for="username" class="sr-only">Username</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            formControlName="username"
+            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+            placeholder="Username"
+          />
+          <div
+            *ngIf="f['username'].invalid && f['username'].touched"
+            class="text-red-500 text-xs mt-1 ml-2"
+          >
+            Username is required (min 3 characters)
+          </div>
+        </div>
+        <div class="relative">
+          <label for="password" class="sr-only">Password</label>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            name="password"
+            formControlName="password"
+            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm pr-10"
+            placeholder="Password"
+          />
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 z-20"
+          >
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+          <div
+            *ngIf="f['password'].invalid && f['password'].touched"
+            class="text-red-500 text-xs mt-1 ml-2"
+          >
+            Password is required (min 6 characters)
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="rounded-md bg-red-50 p-4">
+        <div class="flex">
+          <div class="shrink-0">
+            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">{{ errorMessage }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          z-button
+          zType="outline"
+          [disabled]="loginForm.invalid || isLoading"
+          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span *ngIf="isLoading" class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          </span>
+          {{ isLoading ? 'Signing in...' : 'Sign in as ' + loginMode }}
+        </button>
+      </div>
+
+      <div class="text-center">
+        <p class="text-sm text-gray-600">
+          Don't have an account?
+          <a
+            *ngIf="loginMode === 'patient'"
+            routerLink="/auth/register"
+            class="font-medium text-indigo-600 hover:text-indigo-500 ml-1"
+          >
+            Sign up as patient
+          </a>
+          <span *ngIf="loginMode !== 'patient'" class="text-gray-500 ml-1">
+            Contact administrator for {{ loginMode }} account
+          </span>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

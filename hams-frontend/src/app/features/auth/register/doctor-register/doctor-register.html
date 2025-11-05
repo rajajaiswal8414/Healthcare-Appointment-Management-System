@@ -1,0 +1,255 @@
+<!-- doctor-register.html -->
+<div class="doctor-register-container relative p-6">
+  <!-- Top-right close (visible on desktop and mobile) -->
+  <button
+    type="button"
+    (click)="closeModal()"
+    aria-label="Close registration form"
+    class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 bg-white/70 hover:bg-white px-2 py-1 rounded-full shadow transition"
+  >
+    <!-- simple X icon -->
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M6 18L18 6M6 6l12 12"
+      ></path>
+    </svg>
+  </button>
+
+  <!-- Close button for mobile or additional close option -->
+  <div class="md:hidden flex justify-end mb-4">
+    <button
+      (click)="closeModal()"
+      class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 w-8 h-8 flex items-center justify-center rounded-full transition-colors duration-200"
+      aria-label="Close registration form"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="space-y-6">
+    <!-- Personal Information Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Doctor Name</label>
+        <input
+          type="text"
+          formControlName="doctorName"
+          class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+          placeholder="Enter your full name"
+        />
+        <p
+          *ngIf="f['doctorName'].invalid && f['doctorName'].touched"
+          class="text-red-500 text-sm mt-2 ml-1"
+        >
+          Name is required (min 3 chars).
+        </p>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+          placeholder="Enter your email"
+        />
+        @if (f['email'].invalid && f['email'].touched) {
+        <p class="text-red-500 text-sm mt-2 ml-1">A valid email is required.</p>
+        }
+      </div>
+    </div>
+
+    <!-- Professional Information -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Qualification</label>
+        <input
+          type="text"
+          formControlName="qualification"
+          class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+          placeholder="e.g., MD, MBBS, FRCS"
+        />
+        <p
+          *ngIf="f['qualification'].invalid && f['qualification'].touched"
+          class="text-red-500 text-sm mt-2 ml-1"
+        >
+          Qualification is required.
+        </p>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Specialization</label>
+        <select
+          formControlName="specialization"
+          class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+        >
+          <option value="">Select Specialization</option>
+          <option *ngFor="let spec of availableSpecializations" [value]="spec">{{ spec }}</option>
+        </select>
+        <p
+          *ngIf="f['specialization'].invalid && f['specialization'].touched"
+          class="text-red-500 text-sm mt-2 ml-1"
+        >
+          Specialization is required.
+        </p>
+      </div>
+    </div>
+
+    <!-- Experience & Contact -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Years of Experience</label>
+        <input
+          type="number"
+          formControlName="yearOfExperience"
+          class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+          placeholder="Enter experience in years"
+          min="0"
+          max="50"
+        />
+        <p
+          *ngIf="f['yearOfExperience'].invalid && f['yearOfExperience'].touched"
+          class="text-red-500 text-sm mt-2 ml-1"
+        >
+          Experience (min 0) is required.
+        </p>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+        <input
+          type="tel"
+          formControlName="contactNumber"
+          class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+          placeholder="Enter your phone number"
+        />
+        <p
+          *ngIf="f['contactNumber'].invalid && f['contactNumber'].touched"
+          class="text-red-500 text-sm mt-2 ml-1"
+        >
+          A valid phone number is required.
+        </p>
+      </div>
+    </div>
+
+    <!-- Clinic Address -->
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Clinic Address</label>
+      <textarea
+        formControlName="clinicAddress"
+        rows="3"
+        class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 resize-none"
+        placeholder="Enter your complete clinic address"
+      ></textarea>
+      <p
+        *ngIf="f['clinicAddress'].invalid && f['clinicAddress'].touched"
+        class="text-red-500 text-sm mt-2 ml-1"
+      >
+        Clinic Address is required (min 10 characters).
+      </p>
+    </div>
+
+    <hr class="border-gray-300 my-2" />
+
+    <!-- Login Credentials -->
+    <div>
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Username</label>
+      <input
+        type="text"
+        formControlName="username"
+        class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200"
+        placeholder="Choose a username"
+      />
+      <p
+        *ngIf="f['username'].invalid && f['username'].touched"
+        class="text-red-500 text-sm mt-2 ml-1"
+      >
+        Username is required (min 3 characters).
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+        <div class="relative">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 pr-12"
+            placeholder="Create a password"
+          />
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1"
+          >
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        <p
+          *ngIf="f['password'].invalid && f['password'].touched"
+          class="text-red-500 text-sm mt-2 ml-1"
+        >
+          Password is required (min 6 characters).
+        </p>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+        <div class="relative">
+          <input
+            [type]="showConfirm ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 pr-12"
+            placeholder="Confirm your password"
+          />
+          <button
+            type="button"
+            (click)="toggleConfirm()"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1"
+          >
+            {{ showConfirm ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        <p *ngIf="passwordMismatch" class="text-red-500 text-sm mt-2 ml-1">
+          Passwords do not match
+        </p>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <p
+      *ngIf="errorMessage"
+      class="text-red-500 text-sm font-semibold text-center mt-4 bg-red-50 py-3 rounded-lg border border-red-200"
+    >
+      {{ errorMessage }}
+    </p>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-4 pt-4">
+      <div class="flex-1"></div>
+      <!-- keep spacing so submit fills right side -->
+      <button
+        type="submit"
+        [disabled]="registerForm.invalid || isLoading"
+        class="flex-1 py-3 bg-gradient-to-tr from-indigo-500 to-purple-600 text-white rounded-xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
+      >
+        {{ isLoading ? 'Creating Account...' : 'Create Doctor Account' }}
+      </button>
+    </div>
+
+    <!-- Login Link -->
+    <p class="text-center text-gray-600 mt-6">
+      Already have an account?
+      <a routerLink="/auth/login" class="text-indigo-600 font-semibold hover:underline ml-1"
+        >Login here</a
+      >
+    </p>
+  </form>
+</div>

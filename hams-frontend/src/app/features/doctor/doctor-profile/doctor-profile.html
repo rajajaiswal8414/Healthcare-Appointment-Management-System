@@ -1,0 +1,118 @@
+<div class="mb-4 max-w-4xl mx-auto">
+  <button
+    (click)="goBack()"
+    class="flex items-center text-gray-600 hover:text-blue-600 transition font-medium"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke="currentColor"
+      class="w-5 h-5 mr-2"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+      />
+    </svg>
+    Go Back
+  </button>
+</div>
+
+<h1 class="text-3xl font-extrabold text-gray-800 mb-6 flex items-center gap-3 max-w-4xl mx-auto">
+  <span class="text-indigo-600">🩺</span> Doctor Profile
+</h1>
+
+@if (doctor$ | async; as doctor) {
+<div
+  class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200"
+>
+  <div class="p-6 bg-linear-to-r from-indigo-500 to-purple-600 text-white flex items-center gap-4">
+    <div
+      class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-indigo-600 shadow-lg ring-4 ring-white/50"
+    >
+      {{ doctor.doctorName.charAt(0).toUpperCase() }}
+    </div>
+    <div>
+      <h2 class="text-3xl font-bold">Dr. {{ doctor.doctorName }}</h2>
+      <p class="text-indigo-200 mt-1">{{ doctor.specialization }}</p>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+  <div
+    class="p-4 bg-red-100 text-red-700 border-l-4 border-red-500 font-semibold mx-4 mt-4 rounded-lg"
+  >
+    {{ errorMessage }}
+  </div>
+  }
+
+  <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
+    <div class="space-y-1">
+      <label class="block text-sm font-semibold text-gray-500">Doctor ID</label>
+      <p class="text-gray-800 font-medium p-2 bg-gray-50 rounded-lg border border-gray-100">
+        {{ doctor.doctorId }}
+      </p>
+    </div>
+
+    <div class="space-y-1">
+      <label class="block text-sm font-semibold text-gray-500">Full Name</label>
+      <p class="text-gray-800 font-medium p-2 bg-gray-50 rounded-lg border border-gray-100">
+        {{ doctor.doctorName }}
+      </p>
+    </div>
+
+    <div class="space-y-1">
+      <label class="block text-sm font-semibold text-gray-500">Email Address</label>
+      <p class="text-gray-800 font-medium p-2 bg-gray-50 rounded-lg border border-gray-100">
+        {{ doctor.email }}
+      </p>
+    </div>
+
+    <div class="space-y-1">
+      <label class="block text-sm font-semibold text-gray-500">Contact Number</label>
+      <p class="text-gray-800 font-medium p-2 bg-gray-50 rounded-lg border border-gray-100">
+        {{ doctor.contactNumber }}
+      </p>
+    </div>
+
+    <div class="space-y-1">
+      <label class="block text-sm font-semibold text-gray-500">Highest Qualification</label>
+      <p class="text-gray-800 font-medium p-2 bg-gray-50 rounded-lg border border-gray-100">
+        {{ doctor.qualification }}
+      </p>
+    </div>
+
+    <div class="space-y-1">
+      <label class="block text-sm font-semibold text-gray-500">Specialization</label>
+      <p class="text-gray-800 font-medium p-2 bg-gray-50 rounded-lg border border-gray-100">
+        {{ doctor.specialization }}
+      </p>
+    </div>
+
+    <div class="space-y-1">
+      <label class="block text-sm font-semibold text-gray-500">Years of Experience</label>
+      <p class="text-gray-800 font-medium p-2 bg-gray-50 rounded-lg border border-gray-100">
+        {{ doctor.yearOfExperience }} years
+      </p>
+    </div>
+
+    <div class="md:col-span-2 space-y-1">
+      <label class="block text-sm font-semibold text-gray-500">Clinic Address</label>
+      <p class="text-gray-800 font-medium p-2 bg-gray-50 rounded-lg border border-gray-100">
+        {{ doctor.clinicAddress }}
+      </p>
+    </div>
+  </div>
+
+  <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+    <span class="text-gray-500 text-sm italic">Profile displayed in read-only mode.</span>
+  </div>
+</div>
+} @else {
+<div class="max-w-4xl mx-auto text-center py-12 text-gray-500">
+  <p>Loading doctor profile...</p>
+</div>
+}

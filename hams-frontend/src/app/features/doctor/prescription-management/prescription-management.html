@@ -1,0 +1,272 @@
+<body class="font-sans bg-gray-100 text-gray-800">
+  <aside class="w-64 bg-white shadow-lg fixed h-full overflow-y-auto">
+    <div class="px-6 py-8 border-b border-gray-200">
+      <div class="text-2xl font-bold text-blue-600 flex items-center gap-2">⚕ MediCare</div>
+    </div>
+    <ul class="mt-6 space-y-1">
+      <li>
+        <a
+          [routerLink]="['/doctor/patients']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >👥 Patients</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/doctor/prescriptions']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-blue-600 bg-blue-50 border-l-4 border-blue-600 transition"
+          >💊 Prescriptions</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/doctor/availability']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >⏰ Availability</a
+        >
+      </li>
+    </ul>
+  </aside>
+
+  <main class="ml-64 p-8 min-h-screen">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">Manage Prescriptions</h1>
+      <div class="text-sm text-gray-500 mt-1">
+        <a [routerLink]="['/doctor/dashboard']" class="hover:underline">Dashboard</a> /
+        Prescriptions
+      </div>
+    </div>
+
+    <div class="flex border-b border-gray-200 mb-6">
+      <button
+        class="px-6 py-3 text-lg font-medium transition duration-150 ease-in-out"
+        [ngClass]="{
+          'border-b-4 border-blue-600 text-blue-600': currentTab === 'history',
+          'text-gray-500 hover:text-gray-700': currentTab !== 'history'
+        }"
+        (click)="switchTab('history')"
+      >
+        History
+      </button>
+      <button
+        class="px-6 py-3 text-lg font-medium transition duration-150 ease-in-out"
+        [ngClass]="{
+          'border-b-4 border-blue-600 text-blue-600': currentTab === 'create',
+          'text-gray-500 hover:text-gray-700': currentTab !== 'create'
+        }"
+        (click)="switchTab('create')"
+      >
+        Create New
+      </button>
+    </div>
+
+    <div *ngIf="currentTab === 'history'" class="bg-white shadow-xl rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-4 border-b pb-2">Recent Prescriptions</h2>
+
+      <div *ngIf="prescriptionHistory.length === 0" class="text-center py-10 text-gray-500">
+        <div class="text-6xl mb-3">📄</div>
+        <h3 class="text-lg font-semibold">No prescriptions found.</h3>
+        <p>Start a new prescription using the 'Create New' tab.</p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table *ngIf="prescriptionHistory.length > 0" class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Patient
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Date
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Meds Count
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Status
+              </th>
+              <th
+                class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let p of prescriptionHistory">
+              <td class="px-4 py-4 whitespace-nowrap">
+                <div class="font-medium text-gray-900">{{ p.patientName }}</div>
+                <div class="text-sm text-gray-500">{{ p.diagnosis }}</div>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ p.date | date }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ p.medications.length }}
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap">
+                <span
+                  [ngClass]="{
+                    'bg-green-100 text-green-800': p.status === 'Sent',
+                    'bg-yellow-100 text-yellow-800': p.status === 'Draft'
+                  }"
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                >
+                  {{ p.status }}
+                </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button
+                  (click)="viewPrescription(p)"
+                  class="text-blue-600 hover:text-blue-900 mr-3"
+                >
+                  View
+                </button>
+                <button
+                  *ngIf="p.status === 'Draft'"
+                  (click)="deletePrescription(p.id)"
+                  class="text-red-600 hover:text-red-900"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="currentTab === 'create'" class="bg-white shadow-xl rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-6 border-b pb-2">
+        {{ isEditMode ? 'Edit Prescription' : 'Create New Prescription' }}
+      </h2>
+
+      <form (ngSubmit)="savePrescription()">
+        <div class="mb-5">
+          <label for="patient" class="block text-sm font-medium text-gray-700 mb-1"
+            >Select Patient</label
+          >
+          <select
+            id="patient"
+            [(ngModel)]="newPrescription.patientId"
+            name="patient"
+            required
+            class="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="" disabled>Search or Select a Patient</option>
+            <option *ngFor="let p of patientList" [ngValue]="p.patientId">
+              {{ p.name }} ({{ p.dateOfBirth }})
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-5">
+          <label for="diagnosis" class="block text-sm font-medium text-gray-700 mb-1"
+            >Diagnosis / Notes</label
+          >
+          <textarea
+            id="diagnosis"
+            [(ngModel)]="newPrescription.diagnosis"
+            name="diagnosis"
+            rows="2"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 sm:text-sm"
+            placeholder="e.g., Acute Bronchitis, follow-up in 7 days"
+          ></textarea>
+        </div>
+
+        <h3 class="text-lg font-semibold mt-8 mb-4 border-b pb-2">Medications</h3>
+
+        <div
+          *ngFor="let med of newPrescription.medications; let i = index"
+          class="border p-4 rounded-lg mb-4 bg-gray-50 grid grid-cols-1 md:grid-cols-12 gap-4 items-end"
+        >
+          <div class="md:col-span-4">
+            <label class="block text-sm font-medium text-gray-700">Medication Name</label>
+            <input
+              type="text"
+              [(ngModel)]="med.name"
+              [name]="'medName' + i"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:text-sm"
+              placeholder="e.g., Amoxicillin 500mg"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700">Dosage</label>
+            <input
+              type="text"
+              [(ngModel)]="med.dosage"
+              [name]="'medDose' + i"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:text-sm"
+              placeholder="e.g., 1 tablet"
+            />
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="block text-sm font-medium text-gray-700">Frequency / Instructions</label>
+            <input
+              type="text"
+              [(ngModel)]="med.instructions"
+              [name]="'medInstruct' + i"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:text-sm"
+              placeholder="e.g., twice daily after meals"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700">Duration (Days)</label>
+            <input
+              type="number"
+              [(ngModel)]="med.durationDays"
+              [name]="'medDuration' + i"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 sm:text-sm"
+              min="1"
+            />
+          </div>
+
+          <div class="md:col-span-1 flex justify-end">
+            <button
+              type="button"
+              (click)="removeMedication(i)"
+              class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-md shadow-sm text-lg"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="addMedication()"
+          class="mt-2 px-4 py-2 border border-blue-600 text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 transition duration-150"
+        >
+          + Add Medication
+        </button>
+
+        <div class="mt-8 pt-4 border-t flex justify-end space-x-3">
+          <button
+            type="button"
+            (click)="saveDraft()"
+            class="px-6 py-2 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition duration-150"
+          >
+            Save Draft
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150"
+          >
+            {{ isEditMode ? 'Update & Send' : 'Send Prescription' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</body>

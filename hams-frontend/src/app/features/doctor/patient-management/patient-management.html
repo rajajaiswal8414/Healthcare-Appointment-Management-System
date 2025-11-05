@@ -1,0 +1,334 @@
+<body class="font-sans bg-gray-100 text-gray-800">
+  <aside class="fixed overflow-y-auto w-64 bg-white shadow-lg p-6 shrink-0 h-[90%]">
+    <div class="px-6 py-8 border-b border-gray-200">
+      <div class="text-2xl font-bold text-blue-600 flex items-center gap-2">⚕ MediCare</div>
+    </div>
+    <ul class="mt-6 space-y-1">
+      <li>
+        <a
+          [routerLink]="['/doctor/dashboard']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >📊 Dashboard</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/doctor/appointments']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >📅 Appointments</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/doctor/patients']"
+          class="flex items-center gap-2 px-4 py-2 font-medium text-gray-700 bg-blue-50 border-l-4 border-blue-600 rounded-r-md"
+          >👥 Patients</a
+        >
+      </li>
+
+      <li>
+        <a
+          [routerLink]="['/doctor/availability']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >⏰ Availability</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/doctor/medical-record']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >📋 Medical Records</a
+        >
+      </li>
+
+      <li>
+        <button
+          (click)="logout()"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-red-600 hover:bg-gray-100 hover:border-l-4 hover:border-red-600 rounded-l w-full text-left"
+        >
+          🚪 Logout
+        </button>
+      </li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <div class="top-bar-header">
+        <div>
+          <h1>My Patients</h1>
+          <div class="breadcrumb">
+            <a [routerLink]="['/doctor/dashboard']">Dashboard</a> / Patients
+          </div>
+        </div>
+        <div class="view-toggle">
+          <button
+            class="view-btn"
+            [ngClass]="{ active: currentView === 'grid' }"
+            (click)="switchView('grid')"
+          >
+            🔲 Grid
+          </button>
+          <button
+            class="view-btn"
+            [ngClass]="{ active: currentView === 'list' }"
+            (click)="switchView('list')"
+          >
+            📋 List
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search patients by name..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="refreshView()"
+          />
+        </div>
+        <select class="filter-select" [(ngModel)]="genderFilter" (ngModelChange)="refreshView()">
+          <option value="all">All Genders</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+        <select class="filter-select" [(ngModel)]="ageFilter" (ngModelChange)="refreshView()">
+          <option value="all">All Ages</option>
+          <option value="0-18">0-18 years</option>
+          <option value="19-35">19-35 years</option>
+          <option value="36-60">36-60 years</option>
+          <option value="60+">60+ years</option>
+        </select>
+        <select class="filter-select" [(ngModel)]="sortFilter" (ngModelChange)="refreshView()">
+          <option value="name">Sort by Name</option>
+          <option value="age">Sort by Age</option>
+          <!-- <option value="visits">Sort by Visits</option> -->
+          <!-- <option value="lastVisit">Sort by Last Visit</option> -->
+        </select>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>Total Patients</h3>
+          <p>{{ totalCount }}</p>
+        </div>
+        <div class="stat-icon">👥</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>New This Month</h3>
+          <p>{{ newCount }}</p>
+        </div>
+        <div class="stat-icon">✨</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>Active Treatments</h3>
+          <p>{{ activeCount }}</p>
+        </div>
+        <div class="stat-icon">💊</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <h3>Follow-ups Due</h3>
+          <p>{{ followupCount }}</p>
+        </div>
+        <div class="stat-icon">🔔</div>
+      </div>
+    </div>
+
+    @if (currentView === 'grid') {
+    <div class="patients-grid">
+      <div *ngIf="filteredPatients.length === 0" class="empty-state" style="grid-column: 1 / -1">
+        <div class="empty-icon">👥</div>
+        <h3>No patients found</h3>
+        <p>Try adjusting your filters or search criteria</p>
+      </div>
+
+      @for (patient of filteredPatients; track $index) {
+      <div class="patient-card">
+        <div class="patient-header">
+          <div class="patient-avatar">{{ getInitials(patient.name) }}</div>
+          <div class="patient-info">
+            <h3>{{ patient.name }}</h3>
+            <div class="patient-details">{{ patient.age }} years • {{ patient.gender }}</div>
+          </div>
+        </div>
+
+        <!-- <div class="patient-stats"> -->
+        <!-- <div class="patient-stat"> -->
+        <!-- <div class="stat-number">{{ patient.totalVisits }}</div> -->
+        <!-- <div class="stat-text">Visits</div> -->
+        <!-- </div> -->
+        <!-- <div class="patient-stat"> -->
+        <!-- <div class="stat-number">{{ patient.activeTreatments }}</div> -->
+        <!-- <div class="stat-text">Active</div> -->
+        <!-- </div> -->
+        <!-- <div class="patient-stat"> -->
+        <!-- <div class="stat-number">{{ getDaysSinceVisit(patient.lastVisit) }}</div> -->
+        <!-- <div class="stat-text">Days Ago</div> -->
+        <!-- </div> -->
+        <!-- </div> -->
+
+        <div style="color: #718096; font-size: 0.9rem; margin-bottom: 1rem">
+          📞 {{ patient.contactNumber }}<br />
+          📧 {{ patient.email }}
+        </div>
+
+        <div class="patient-actions">
+          <button class="btn btn-primary btn-sm" (click)="viewProfile(patient)" style="flex: 1">
+            View Profile
+          </button>
+          <!-- <button class="btn btn-success btn-sm" (click)="bookAppointment(patient)">📅</button> -->
+          <!-- <button class="btn btn-secondary btn-sm" (click)="sendMessage(patient)">💬</button> -->
+        </div>
+      </div>
+      }
+    </div>
+    } @if (currentView === 'list') {
+    <div class="patients-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Contact Number</th>
+            <!-- <th>Last Visit</th> -->
+            <!-- <th>Total Visits</th> -->
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (filteredPatients.length === 0) {
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 3rem">
+              <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <h3>No patients found</h3>
+                <p>Try adjusting your filters or search criteria</p>
+              </div>
+            </td>
+          </tr>
+          } @for (patient of filteredPatients; track $index) {
+          <tr>
+            <td>
+              <div class="patient-cell">
+                <div class="patient-avatar-sm">{{ getInitials(patient.name) }}</div>
+                <div>
+                  <div style="font-weight: 600; color: #2d3748">{{ patient.name }}</div>
+                  <div style="font-size: 0.85rem; color: #718096">{{ patient.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ patient.age }}</td>
+            <td>{{ patient.gender }}</td>
+            <td>{{ patient.contactNumber }}</td>
+            <!-- <td>{{ formatVisitDate(patient.lastVisit) }}</td> -->
+            <!-- <td>{{ patient.totalVisits }}</td> -->
+            <td>
+              <div style="display: flex; gap: 0.5rem">
+                <button class="btn btn-primary btn-sm" (click)="viewProfile(patient)">View</button>
+                <!-- <button class="btn btn-success btn-sm" (click)="bookAppointment(patient)">
+                  Book
+                </button> -->
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </main>
+
+  <div class="modal" [ngClass]="{ show: showProfileModal }" (click)="closeModal()">
+    @if (selectedPatient) {
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Patient Profile</h2>
+        <button class="close-btn" (click)="closeModal()">×</button>
+      </div>
+
+      <div id="profile-content">
+        <div class="profile-section">
+          <div class="profile-avatar-lg">{{ getInitials(selectedPatient.name) }}</div>
+          <div class="profile-details">
+            <h2 class="profile-name">{{ selectedPatient.name }}</h2>
+            <div class="profile-meta">
+              {{ selectedPatient.age }} years • {{ selectedPatient.gender }}
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+              <!-- <button class="btn btn-success btn-sm" (click)="bookAppointment(selectedPatient)">
+                📅 Book Appointment
+              </button> -->
+              <!-- <button class="btn btn-primary btn-sm" (click)="viewMedicalRecords(selectedPatient)">
+                📋 Medical Records
+              </button> -->
+              <!-- <button class="btn btn-secondary btn-sm" (click)="sendMessage(selectedPatient)">
+                💬 Message
+              </button> -->
+            </div>
+          </div>
+        </div>
+
+        <h3 class="section-title">Contact Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Contact Number</div>
+            <div class="info-value">{{ selectedPatient.contactNumber }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Email</div>
+            <div class="info-value">{{ selectedPatient.email }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Blood Group</div>
+            <div class="info-value">{{ selectedPatient.bloodGroup }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Address</div>
+            <div class="info-value">{{ selectedPatient.address }}</div>
+          </div>
+        </div>
+
+        <!-- <h3 class="section-title">Health Statistics</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Total Visits</div>
+            <div class="info-value">{{ selectedPatient.totalVisits }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Active Treatments</div>
+            <div class="info-value">{{ selectedPatient.activeTreatments }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Last Visit</div>
+            <div class="info-value">{{ formatVisitDate(selectedPatient.lastVisit) }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Registration Date</div>
+            <div class="info-value">{{ formatVisitDate(selectedPatient.registrationDate) }}</div>
+          </div>
+        </div> -->
+
+        <h3 class="section-title">Medical History</h3>
+        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
+          <p class="text-gray-600 mb-3">
+            View the patient's comprehensive medical history by clicking the button below.
+          </p>
+          <button class="btn btn-primary btn-sm" (click)="viewMedicalRecords(selectedPatient)">
+            📋 View Full Medical Records
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</body>

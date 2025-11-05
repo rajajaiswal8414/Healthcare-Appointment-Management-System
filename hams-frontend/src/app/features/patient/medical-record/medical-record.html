@@ -1,0 +1,212 @@
+<div class="flex min-h-screen">
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-8 bg-gray-100 overflow-y-auto ml-64">
+    <app-header [patient]="patient"></app-header>
+
+    <div class="bg-white p-6 rounded-xl shadow">
+      <div class="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
+        <h2 class="text-2xl font-bold text-gray-800">Medical Records</h2>
+        <div class="text-sm text-gray-500">{{ medicalRecords.length }} record(s) found</div>
+      </div>
+
+      <!-- Medical Records List -->
+      <div class="space-y-6">
+        @for (record of medicalRecords; track record.recordId) {
+        <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-4 mb-3">
+                <div
+                  class="w-12 h-12 bg-linear-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold"
+                >
+                  🏥
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-800 text-lg">
+                    Consultation with Dr. {{ record.doctorName }}
+                  </h3>
+                  <p class="text-gray-500 text-sm">
+                    {{ record.createdAt | date : 'fullDate' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                @if (record.reason) {
+                <div>
+                  <h4 class="font-medium text-gray-700 mb-1">Reason for Visit</h4>
+                  <p class="text-gray-600">{{ record.reason }}</p>
+                </div>
+                } @if (record.diagnosis) {
+                <div>
+                  <h4 class="font-medium text-gray-700 mb-1">Diagnosis</h4>
+                  <p class="text-gray-600">{{ record.diagnosis }}</p>
+                </div>
+                }
+              </div>
+
+              @if (record.notes) {
+              <div class="mb-4">
+                <h4 class="font-medium text-gray-700 mb-1">Doctor's Notes</h4>
+                <p class="text-gray-600">{{ record.notes }}</p>
+              </div>
+              } @if (hasPrescriptions(record)) {
+              <div class="border-t border-gray-200 pt-4">
+                <h4 class="font-medium text-gray-700 mb-3">Prescriptions</h4>
+                <div class="space-y-2">
+                  @for (prescription of record.prescriptions; track prescription.prescriptionId) {
+                  <div class="flex justify-between items-center bg-gray-50 p-3 rounded">
+                    <div>
+                      <p class="font-semibold text-gray-800">{{ prescription.medicationName }}</p>
+                      <p class="text-sm text-gray-600">
+                        {{ prescription.dosage }} • {{ prescription.instructions }}
+                      </p>
+                    </div>
+                    <span class="text-xs text-gray-500">
+                      {{ prescription.prescribedAt | date : 'shortDate' }}
+                    </span>
+                  </div>
+                  }
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+
+          <div class="flex gap-2 pt-4 border-t border-gray-200">
+            <button
+              (click)="viewRecordDetails(record)"
+              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition text-sm"
+            >
+              View Details
+            </button>
+
+            @if (hasPrescriptions(record)) {
+            <button
+              (click)="downloadPrescription(record)"
+              class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition text-sm"
+            >
+              Download Prescription
+            </button>
+            }
+          </div>
+        </div>
+        } @if (medicalRecords.length === 0) {
+        <div class="text-center py-12 text-gray-500">
+          <div class="text-6xl mb-4">📋</div>
+          <h3 class="text-xl font-semibold mb-2">No medical records found</h3>
+          <p>Your medical records will appear here after your appointments.</p>
+        </div>
+        }
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Medical Record Details Modal -->
+@if (showRecordModal && selectedRecord) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xl font-semibold text-gray-800">Medical Record Details</h3>
+        <button (click)="closeRecordModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
+          ×
+        </button>
+      </div>
+      <p class="text-gray-600 mt-1">
+        Consultation with Dr. {{ selectedRecord.doctorName }} on
+        {{ selectedRecord.createdAt | date : 'fullDate' }}
+      </p>
+    </div>
+
+    <div class="p-6 space-y-6">
+      <!-- Basic Information -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold text-gray-700 mb-2">Patient Information</h4>
+          <div class="space-y-1 text-sm">
+            <p><span class="font-medium">Name:</span> {{ selectedRecord.patientName }}</p>
+            <p><span class="font-medium">Doctor:</span> Dr. {{ selectedRecord.doctorName }}</p>
+            <p>
+              <span class="font-medium">Date:</span>
+              {{ selectedRecord.createdAt | date : 'fullDate' }}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-gray-700 mb-2">Visit Information</h4>
+          <div class="space-y-1 text-sm">
+            @if (selectedRecord.reason) {
+            <p><span class="font-medium">Reason:</span> {{ selectedRecord.reason }}</p>
+            } @if (selectedRecord.diagnosis) {
+            <p><span class="font-medium">Diagnosis:</span> {{ selectedRecord.diagnosis }}</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor's Notes -->
+      @if (selectedRecord.notes) {
+      <div>
+        <h4 class="font-semibold text-gray-700 mb-2">Doctor's Notes</h4>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <p class="text-gray-700">{{ selectedRecord.notes }}</p>
+        </div>
+      </div>
+      }
+
+      <!-- Prescriptions -->
+      @if (hasPrescriptions(selectedRecord)) {
+      <div>
+        <h4 class="font-semibold text-gray-700 mb-3">Prescriptions</h4>
+        <div class="space-y-3">
+          @for (prescription of selectedRecord.prescriptions; track prescription.prescriptionId) {
+          <div class="border border-gray-200 rounded-lg p-4">
+            <div class="flex justify-between items-start mb-2">
+              <h5 class="font-semibold text-lg text-gray-800">{{ prescription.medicationName }}</h5>
+              <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                {{ prescription.prescribedAt | date : 'shortDate' }}
+              </span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span class="font-medium text-gray-700">Dosage:</span>
+                <span class="text-gray-600 ml-2">{{ prescription.dosage }}</span>
+              </div>
+              <div>
+                <span class="font-medium text-gray-700">Instructions:</span>
+                <span class="text-gray-600 ml-2">{{
+                  prescription.instructions || 'As directed'
+                }}</span>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+
+    <div class="p-6 border-t border-gray-200 flex gap-3">
+      <button
+        (click)="closeRecordModal()"
+        class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition font-medium"
+      >
+        Close
+      </button>
+      @if (hasPrescriptions(selectedRecord)) {
+      <button
+        (click)="downloadPrescription(selectedRecord)"
+        class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-500 transition font-medium"
+      >
+        Download All Prescriptions
+      </button>
+      }
+    </div>
+  </div>
+</div>
+}

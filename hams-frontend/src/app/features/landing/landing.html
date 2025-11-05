@@ -1,0 +1,176 @@
+<section class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white py-20">
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+    <!-- Hero Text -->
+    <div class="space-y-6">
+      <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Your Health, Simplified</h1>
+      <p class="text-lg md:text-xl text-white/90">
+        Book appointments with top doctors instantly. Manage your health records, get prescriptions,
+        and stay connected with healthcare providers - all in one place.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4">
+        @if (!isAuthenticated) {
+        <button
+          (click)="navigateToLogin()"
+          class="bg-white text-indigo-600 font-medium px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition"
+        >
+          Get Started
+        </button>
+        } @else {
+        <button
+          (click)="navigateToDashboard()"
+          class="bg-white text-indigo-600 font-medium px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition"
+        >
+          Get Started
+        </button>
+        }
+
+        <a
+          href="#how-it-works"
+          class="border border-white text-white font-medium px-8 py-3 rounded-lg text-lg hover:bg-white hover:text-indigo-600 transition"
+        >
+          Learn More
+        </a>
+      </div>
+    </div>
+
+    <!-- Hero Image / Illustration -->
+    <div class="flex justify-center items-center">
+      <div
+        class="w-full max-w-md h-80 bg-white/10 rounded-2xl flex items-center justify-center text-7xl backdrop-blur-lg"
+      >
+        🏥
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="bg-gray-100 py-20">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-4xl font-bold text-center text-gray-800 mb-4">Why Choose MediCare?</h2>
+    <p class="text-center text-gray-500 text-lg mb-12">
+      Everything you need to manage your healthcare journey
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div
+        class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1"
+      >
+        <div class="text-4xl mb-4">📅</div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">Easy Booking</h3>
+        <p class="text-gray-500 leading-relaxed">
+          Book appointments with verified doctors in just a few clicks. Choose your preferred time
+          slot and get instant confirmation.
+        </p>
+      </div>
+      <div
+        class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1"
+      >
+        <div class="text-4xl mb-4">👨‍⚕️</div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">Verified Doctors</h3>
+        <p class="text-gray-500 leading-relaxed">
+          Access a network of certified healthcare professionals across multiple specializations
+          ready to help you.
+        </p>
+      </div>
+      <div
+        class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1"
+      >
+        <div class="text-4xl mb-4">📋</div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">Digital Records</h3>
+        <p class="text-gray-500 leading-relaxed">
+          Store and access your medical records securely from anywhere. Share them easily with your
+          healthcare providers.
+        </p>
+      </div>
+      <div
+        class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1"
+      >
+        <div class="text-4xl mb-4">💊</div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">E-Prescriptions</h3>
+        <p class="text-gray-500 leading-relaxed">
+          Receive digital prescriptions instantly after consultations. Never lose a prescription
+          again.
+        </p>
+      </div>
+      <div
+        class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1"
+      >
+        <div class="text-4xl mb-4">🔔</div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">Smart Reminders</h3>
+        <p class="text-gray-500 leading-relaxed">
+          Get timely notifications for upcoming appointments, medication schedules, and follow-ups.
+        </p>
+      </div>
+      <div
+        class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1"
+      >
+        <div class="text-4xl mb-4">🔒</div>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800">Secure & Private</h3>
+        <p class="text-gray-500 leading-relaxed">
+          Your health data is encrypted and protected with industry-leading security standards.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="bg-white py-20">
+  <div class="max-w-7xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-bold text-gray-800 mb-4">How It Works</h2>
+    <p class="text-gray-500 text-lg mb-12">Get started in three simple steps</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="flex flex-col items-center">
+        <div
+          class="w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold mb-4"
+        >
+          1
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Create Your Account</h3>
+        <p class="text-gray-500">
+          Sign up in seconds with your basic information. It's quick, easy, and completely free.
+        </p>
+      </div>
+      <div class="flex flex-col items-center">
+        <div
+          class="w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold mb-4"
+        >
+          2
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Find Your Doctor</h3>
+        <p class="text-gray-500">
+          Browse through our network of verified doctors and select the one that best fits your
+          needs.
+        </p>
+      </div>
+      <div class="flex flex-col items-center">
+        <div
+          class="w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold mb-4"
+        >
+          3
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Book & Consult</h3>
+        <p class="text-gray-500">
+          Choose your preferred time slot, book your appointment, and get the care you deserve.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-gradient-to-r from-indigo-500 to-purple-600 py-20 text-center text-white">
+  <div class="max-w-3xl mx-auto px-6">
+    <h2 class="text-4xl font-bold mb-4">Ready to Take Control of Your Health?</h2>
+    <p class="text-lg mb-8 opacity-95">
+      Join thousands of patients who trust MediCare for their healthcare needs
+    </p>
+    <a
+      href="/register"
+      class="bg-white text-indigo-600 font-semibold text-lg px-10 py-3 rounded-lg inline-block hover:bg-gray-100 transition"
+      >Sign Up Now</a
+    >
+  </div>
+</section>

@@ -1,0 +1,224 @@
+<body class="font-sans bg-gray-100 text-gray-800">
+  <aside class="fixed overflow-y-auto w-64 bg-white shadow-lg p-6 shrink-0 h-[90%]">
+    <div class="px-6 py-8 border-b border-gray-200">
+      <div class="text-2xl font-bold text-blue-600 flex items-center gap-2">⚕ MediCare</div>
+    </div>
+    <ul class="mt-6 space-y-1">
+      <li>
+        <a
+          [routerLink]="['/doctor/dashboard']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >📊 Dashboard</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/doctor/appointments']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >📅 Appointments</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/doctor/patients']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >👥 Patients</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/doctor/availability']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-blue-600 bg-blue-50 border-l-4 border-blue-600 transition"
+          >⏰ Availability</a
+        >
+      </li>
+
+      <li>
+        <a
+          [routerLink]="['/doctor/medical-record']"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-gray-600 hover:bg-gray-100 hover:text-blue-600 hover:border-l-4 hover:border-blue-600 transition"
+          >📋 Medical Records</a
+        >
+      </li>
+      <li>
+        <button
+          (click)="logout()"
+          class="flex items-center gap-3 px-6 py-3 font-medium text-red-600 hover:bg-gray-100 hover:border-l-4 hover:border-red-600 rounded-l w-full text-left"
+        >
+          🚪 Logout
+        </button>
+      </li>
+    </ul>
+  </aside>
+
+  <main class="ml-64 p-8 min-h-screen">
+    <div class="flex justify-between items-start mb-6 bg-white rounded-xl shadow p-6">
+      <div>
+        <h1 class="text-2xl font-semibold text-gray-800">Manage Availability</h1>
+        <div class="text-gray-500 text-sm mt-1">
+          <a [routerLink]="['/doctor/dashboard']" class="text-blue-600">Dashboard</a> / Availability
+        </div>
+      </div>
+    </div>
+
+    <div class="availability-management">
+      <div class="tabs">
+        <button
+          class="btn"
+          [class.btn-active]="currentTab === 'slots'"
+          (click)="switchTab('slots')"
+        >
+          Scheduled Slots
+        </button>
+        <button class="btn" [class.btn-active]="currentTab === 'add'" (click)="switchTab('add')">
+          {{ isEditMode ? 'Edit Slot' : 'Add Availability' }}
+        </button>
+      </div>
+
+      @if (currentTab === 'add') {
+      <div class="add-slot-form bg-white p-6 rounded-lg shadow mt-4">
+        <h3 class="text-xl font-medium mb-4">
+          {{ isEditMode ? 'Edit Slot' : 'Add New Availability' }}
+        </h3>
+
+        <div class="grid grid-cols-3 gap-4">
+          <div class="form-group">
+            <label for="availableDate" class="block text-sm font-medium text-gray-700">Date</label>
+            <input
+              id="availableDate"
+              type="date"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              [(ngModel)]="newSlot.availableDate"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="startTime" class="block text-sm font-medium text-gray-700"
+              >Start Time</label
+            >
+            <select
+              id="startTime"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              [(ngModel)]="newSlot.startTime"
+              required
+            >
+              @for (time of timeOptions; track $index) {
+              <option [value]="time">{{ time }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="endTime" class="block text-sm font-medium text-gray-700">End Time</label>
+            <select
+              id="endTime"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              [(ngModel)]="newSlot.endTime"
+              required
+            >
+              @for (time of timeOptions; track $index) {
+              <option [value]="time">{{ time }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <p class="text-sm text-gray-600 mt-4 p-3 bg-yellow-50 border-l-4 border-yellow-500">
+          **Appointment duration is fixed at 30 minutes.** Please note: No availability can be set
+          between **12:30** and **13:30** (Doctor's Break).
+        </p>
+
+        <div class="mt-6 flex space-x-3">
+          <button
+            class="px-4 py-2 text-white font-medium rounded-md shadow-sm bg-blue-600 hover:bg-blue-700 transition"
+            (click)="saveNewSlot()"
+            [disabled]="!isTimeValid()"
+          >
+            {{ isEditMode ? 'Update Slot' : 'Save Slot' }}
+          </button>
+          <button
+            class="px-4 py-2 text-gray-700 font-medium rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition"
+            (click)="resetForm(); switchTab('slots')"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+      } @if (currentTab === 'slots') {
+      <div class="scheduled-slots bg-white p-6 rounded-lg shadow mt-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-medium">Current Schedule</h3>
+          <button
+            class="px-3 py-1 text-sm text-white font-medium rounded-md shadow-sm bg-green-600 hover:bg-green-700 transition"
+            (click)="switchTab('add'); resetForm()"
+          >
+            + Add New Schedule
+          </button>
+        </div>
+
+        @if (scheduledSlots.length > 0) {
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Date
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Start Time
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                End Time
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            @for (slot of scheduledSlots; track trackByAvailabilityId($index, slot)) {
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {{ slot.availableDate | date }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ slot.startTime }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ slot.endTime }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <button class="text-indigo-600 hover:text-indigo-900 mr-3" (click)="editSlot(slot)">
+                  Edit
+                </button>
+                <button
+                  class="text-red-600 hover:text-red-900"
+                  (click)="deleteSlot(slot.availabilityId)"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+        } @else {
+        <p class="p-4 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+          No availability slots scheduled yet.
+        </p>
+        }
+      </div>
+      }
+    </div>
+  </main>
+</body>
